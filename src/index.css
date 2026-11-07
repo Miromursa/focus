@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+
+/* Calm palette. Components use these tokens only, so dark mode is just a token swap. */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --color-bg: #f6f5f1;
+  --color-surface: #ffffff;
+  --color-muted: #efede7;
+  --color-ink: #24262b;
+  --color-ink-2: #595c64;
+  --color-ink-3: #696c73; /* 4.7:1 on bg, WCAG AA for small text */
+  --color-line: #e2dfd7;
+  --color-accent: #3f6f68;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #e2ece9;
+  --color-note: #f3ecdc;
+  --color-note-ink: #65501f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #131517;
+    --color-surface: #1b1e21;
+    --color-muted: #24282c;
+    --color-ink: #e7e5e0;
+    --color-ink-2: #b1b5bb;
+    --color-ink-3: #868b91;
+    --color-line: #2f3338;
+    --color-accent: #86b8ae;
+    --color-accent-ink: #0e1513;
+    --color-accent-soft: #1f2e2b;
+    --color-note: #2e2a20;
+    --color-note-ink: #e2cf9f;
+  }
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-accent-soft);
+  }
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.4);
+  }
+  summary {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
