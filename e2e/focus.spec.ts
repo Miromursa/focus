@@ -9,8 +9,8 @@ import { extname, join } from 'node:path'
 const at = (date: string, time = '09:00') => new Date(`${date}T${time}:00+01:00`)
 
 /** Runs the first-run setup with one Active project and a daily routine. */
-async function setup(page: Page) {
-  await page.goto('./')
+async function setup(page: Page, url = './') {
+  await page.goto(url)
   await page.getByRole('button', { name: 'Start setup' }).click()
   await page.getByRole('textbox', { name: 'Every project you have going' }).fill('Thesis\nJob applications\nClub newsletter')
   await page.getByRole('button', { name: 'Next' }).click()
@@ -211,21 +211,30 @@ function serveDist(port: number, base: string): Promise<Server> {
   return new Promise((resolve) => server.listen(port, () => resolve(server)))
 }
 
-test('works offline after the first visit', async ({ page, baseURL }) => {
+test('works offline after the first visit, including a refresh on Today', async ({ page, baseURL }) => {
   const base = baseURL ? new URL(baseURL).pathname : '/'
   const port = 4180 + test.info().parallelIndex
   const server = await serveDist(port, base)
   const app = `http://localhost:${port}${base}`
+  await page.clock.install({ time: at('2026-11-02') })
   await page.goto(app)
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready
   })
   await page.reload()
   await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true)
+  await setup(page, app)
 
   server.closeAllConnections()
   await new Promise((resolve) => server.close(resolve))
 
+  // Back to Today through the app, then refresh. The address has to stay inside the service worker's scope.
+  await page.getByRole('link', { name: 'Inbox', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Inbox', exact: true })).toBeVisible()
+  await page.getByRole('link', { name: 'Today', exact: true }).click()
+  await expect(page).toHaveURL(app)
+  await page.reload()
+  await expect(page.getByText('The One Thing')).toBeVisible()
   await page.goto(`${app}inbox`)
-  await expect(page.getByRole('button', { name: 'Start setup' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Inbox', exact: true })).toBeVisible()
 })

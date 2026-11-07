@@ -37,5 +37,6 @@ Keep typecheck, lint, unit and e2e green.
 - `vite.config.ts`: keep `webmanifest` out of `workbox.globPatterns`. The plugin adds the manifest itself, and a duplicate precache entry makes Workbox refuse to install, so the app silently stops working offline.
 - The Claude browser pane can't register service workers. Test offline with `npm run test:e2e` (the offline test serves `dist/` itself and then shuts the server down).
 - On Windows the Vite dev watcher can miss rapid successive edits. If the browser runs stale code, `touch` the file.
+- `App.tsx` gives the router `BASE_URL` with its trailing slash. Stripped, Today's address becomes `/focus`, which is outside the service worker's scope, so refreshing Today offline fails. The offline e2e test covers this.
 - E2E paths are relative to `baseURL` (`page.goto('./')`, `page.goto('inbox')`), so the suite runs under `/focus/` in CI. A leading slash would skip the base path. To run it locally under the base path, set `BASE_PATH=/focus/` from PowerShell; Git Bash rewrites `/focus/` into a Windows path unless you prefix `MSYS_NO_PATHCONV=1`.
 - The repo is public. Commits use the GitHub no-reply address (repo-local `user.email`); keep it, and keep personal data out of commits, test data included.
