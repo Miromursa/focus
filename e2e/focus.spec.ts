@@ -25,6 +25,8 @@ async function setup(page: Page) {
   await page.getByRole('button', { name: 'Next' }).click() // rest → One Thing
   await page.getByRole('textbox', { name: 'Tiny first step' }).fill('Open the mail app')
   await page.getByRole('button', { name: 'Finish setup' }).click()
+  // Today renders only after the setup transaction has committed. Navigating away earlier aborts it.
+  await expect(page.getByText('The One Thing')).toBeVisible()
 }
 
 /** Moves the app's clock and opens the app fresh, as if it was opened at that time. Data stays in IndexedDB. */

@@ -38,6 +38,14 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: End-to-end tests (builds dist/ with the base path)
         run: npm run test:e2e
+      - name: Keep the traces of failed tests
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-results
+          path: test-results
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Serve the app for deep links
         run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v5
